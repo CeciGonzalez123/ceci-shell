@@ -1,5 +1,5 @@
 import emoji
-from colorama import init, Fore, Back
+from colorama import init, Fore
 init(autoreset=True)
 
 def respuesta(msg, tipo='ok'):
