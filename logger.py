@@ -1,4 +1,5 @@
 import logging
+import os
 
 def log(msg, tipo):
     # Tipos de logs
@@ -7,7 +8,7 @@ def log(msg, tipo):
     # Configuración básica del logger
     logging.basicConfig(filename="/var/log/shell/"+logs[tipo]+".log",
                     format='%(asctime)s %(message)s',
-                    filemode='w')
+                    filemode='a')
 
     # Crear un objeto logger
     logger = logging.getLogger()
@@ -16,4 +17,5 @@ def log(msg, tipo):
     logger.setLevel(logging.DEBUG)
 
     # Registrar evento
-    logger.info(msg)
+    username = os.getlogin()
+    logger.info(f"{username}: {msg}")
