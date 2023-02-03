@@ -1,19 +1,29 @@
+import os
+import pwd
+import grp
 import util
 import shutil
 import logger
-import os
+import getpass
+import subprocess
 from pathlib import Path
 from colorama import init, Fore
-import subprocess
-import getpass
-import pwd
-import grp
 
+# Configurar colorama para aplicar reset automaticamente
 init(autoreset=True)
 
-# Cógido de Logs: 0) user_access 1) user_actions 2) ftp_transfer 3) system_error
+"""
+    Códigos "del 0 al 3" para registro de Logs en el archivo correspondiente: 
+    0 -> user_access 
+    1 -> user_actions 
+    2 -> ftp_transfer 
+    3 -> system_error
+"""
 
 def copiar(args):
+    """
+        Copia archivos(s) y/o carpeta(s) al directorio indicado en el último parámetro
+    """
     try:
         origenes = args[:-1]
         destino = Path(args[-1])
@@ -28,9 +38,12 @@ def copiar(args):
         logger.log(msg, 1)
     except Exception as Argument:
         util.respuesta(f"Error al copiar {args[:-1]} en {args[-1]}", "error")
-        logger.log(str(Argument), 1)
+        logger.log(str(Argument), 3)
 
 def mover(args):
+    """
+        Mueve archivos(s) y/o carpeta(s) al directorio indicado en el último parámetro
+    """
     try:
         origenes = args[:-1]
         destino = Path(args[-1])
@@ -45,9 +58,12 @@ def mover(args):
         logger.log(msg, 1)
     except Exception as Argument:
         util.respuesta(f"Error al mover {args[:-1]} en {args[-1]}", "error")
-        logger.log(str(Argument), 1)
+        logger.log(str(Argument), 3)
 
 def renombrar(archivo, nuevo_nombre):
+    """
+        Renombra archivos o carpeta
+    """
     try:
         path = Path(archivo)
         path.rename(nuevo_nombre)
@@ -56,9 +72,12 @@ def renombrar(archivo, nuevo_nombre):
         logger.log(msg, 1)
     except Exception as Argument:
         util.respuesta(f"Error al renombrar {archivo} a {nuevo_nombre}", "error")
-        logger.log(str(Argument), 1)
+        logger.log(str(Argument), 3)
 
 def listar(ruta = "."):
+    """
+        Lista el contenido del directorio actual o de la ruta indicada
+    """
     try:
         path = Path(ruta)
         msg = f"listar archivos y carpeta de la ruta {path}"
@@ -71,9 +90,12 @@ def listar(ruta = "."):
         logger.log(msg, 1)
     except Exception as Argument:
         util.respuesta(f"Error al listar archivos y carpeta de la ruta {ruta}", "error")
-        logger.log(str(Argument), 1)
+        logger.log(str(Argument), 3)
 
 def creadir(args):
+    """
+        Crea directorio(s) indicado(s) en el parametro
+    """
     try:
         for directorio in args:
             Path(directorio).mkdir(parents=True, exist_ok=True)
@@ -82,9 +104,12 @@ def creadir(args):
         logger.log(msg, 1)
     except Exception as Argument:
         util.respuesta(f"Error al crear directorio(s) {args}", "error")
-        logger.log(str(Argument), 1)
+        logger.log(str(Argument), 3)
 
 def ir(directorio):
+    """
+        Cambia al directorio indicado
+    """
     try:
         os.chdir(directorio)
         msg = f"Cambiado al directorio: {os.getcwd()}"
@@ -92,9 +117,12 @@ def ir(directorio):
         logger.log(msg, 1)
     except Exception as Argument:
         util.respuesta(f"Error al cambiar al directorio {directorio}", "error")
-        logger.log(str(Argument), 1)
+        logger.log(str(Argument), 3)
 
 def change_password(username = "root"):
+    """
+        Cambia la contraseña del usuario root o el indicado en el parametro
+    """
     current_password = getpass.getpass("Ingrese password actual:")
     new_password = getpass.getpass("Ingrese nuevo password:")
     confirm_password = getpass.getpass("Confirme nuevo password:")
@@ -102,15 +130,12 @@ def change_password(username = "root"):
     if new_password != confirm_password:
         return "Nuevo password y confirmacion no coinciden."
     
-    result = subprocess.run(["passwd", username], input=current_password + "\n" + new_password + "\n" + new_password + "\n", stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
-    if result.returncode == 0:
-        msg = "Password cambiado exitosamente."
-        util.respuesta(f"{msg}")
-    else:
-        msg = "Fallo al cambiar el password: " + result.stderr
-        util.respuesta(f"{msg}", "error")
+    print("TODO")
 
-def permiso(nombre_del_recurso, permiso):    
+def permiso(nombre_del_recurso, permiso):
+    """
+        Cambia el permiso indicado en los recursos (archivo(s) y/o directorio(s))
+    """
     try:
         # Convertir permiso a octal
         permiso_octal = int(permiso, 8)
@@ -133,10 +158,13 @@ def permiso(nombre_del_recurso, permiso):
         logger.log(msg, 1)
     except Exception as Argument:
         util.respuesta(f"Error al aplicar permiso {permiso} al recurso {nombre_del_recurso}", "error")
-        logger.log(str(Argument), 1)
+        logger.log(str(Argument), 3)
 
 def propiedad(recursos):
-    # Pedir el nombre del usuario y el grupo en el prompt
+    """
+        Carmbia la propiedad de archivos al usuario y grupo indicado
+    """
+    # Solicita el nombre del usuario y el grupo
     user_name = input("Ingrese el nombre de usuario: ")
     group_name = input("Ingrese el nombre del grupo: ")
 
@@ -170,21 +198,69 @@ def propiedad(recursos):
             logger.log(msg, 1)
         except Exception as Argument:
             util.respuesta(f"Error al cambiar la propiedad de {recursos} a grupo {group_name} y usuario {user_name}", "error")
-            logger.log(str(Argument), 1)
+            logger.log(str(Argument), 3)
 
 
 def ruta():
+    """
+        Despliega la ruta del directorio actual
+    """
     ruta_actual = os.getcwd() 
-    msg = "Ruta actual" + str(ruta_actual)
+    msg = "Ruta actual " + str(ruta_actual)
     util.respuesta(msg)
     logger.log(msg, 1)
 
-def historial():
-    with open(os.path.expanduser("~/.bash_history"), "r") as f:
-        lines = f.readlines()
-        for line in lines:
-            print(f"\t{Fore.GREEN}{line.strip()}")
-    logger.log("Visualizacion de historial de comandos ejecutados", 1)
+def buscar(file_path, search_string):
+    """
+        Realiza búsqueda de cadena en un archivo de texto
+    """
+    try:
+        file = Path(file_path)
+        if file.is_file():
+            with open(file_path, 'r') as f:
+                contents = f.read()
+                if search_string in contents:
+                    print(contents.replace(search_string, Fore.GREEN + "\033[1m" + search_string + "\033[0m"))
+                else:
+                    util.respuesta("No se encontró la cadena en el archivo.")
+            logger.log(f"Busqueda de {search_string} en archivo {file_path}", 1)
+        else:
+            msg = f"El archivo {file_path} no es válido."
+            util.respuesta(msg, "error")
+            raise Exception(msg)
+    except Exception as Argument:
+        msg = f"Ha ocurrido un error: busqueda de cadena {search_string} en archivo {file_path}", str(Argument)
+        util.respuesta(msg, "error")
+        logger.log(str(Argument), 3)
 
-def buscar(archivo, busqueda):
-    print("TO DO")
+def ejecutar(args):
+    """
+        Ejecuta comandos del sistema a excepción de los comandos implementados en la shell
+    """
+    comando = args[0]
+    comandos = {
+        'cp': 'copiar',
+        'mv': 'mover',
+        'historial': 'history',
+        'creadir': 'mkfir',
+        'chmod': 'permiso',
+        'chown': 'propietario',
+        'grep': 'buscar',
+        'pwd': 'ruta',
+        'cd': 'ir',
+        'ls': 'listar'
+    }
+
+    implementado = comandos.get(comando)
+    if implementado:
+        util.respuesta(f"Comando implementado, por favor consulte en la {Fore.BLUE}ayuda{Fore.RESET} el comando{Fore.BLUE} {implementado}")
+        return
+
+    try:
+        subprocess.run(args)
+
+    except Exception as Argument:
+        msg = f"Comando de sistema no valido: {' '.join(args)}"
+        util.respuesta(msg, "error")
+        logger.log(str(Argument), 3)
+    
