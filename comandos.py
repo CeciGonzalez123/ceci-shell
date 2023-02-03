@@ -4,6 +4,8 @@ import grp
 import util
 import shutil
 import logger
+import psutil
+import signal
 import getpass
 import subprocess
 from pathlib import Path
@@ -36,9 +38,9 @@ def copiar(args):
         msg = f"Copiado {origenes} en {destino}"
         util.respuesta(msg)
         logger.log(msg, 1)
-    except Exception as Argument:
+    except Exception as e:
         util.respuesta(f"Error al copiar {args[:-1]} en {args[-1]}", "error")
-        logger.log(str(Argument), 3)
+        logger.log(str(e), 3)
 
 def mover(args):
     """
@@ -56,9 +58,9 @@ def mover(args):
         msg = f"Movido {origenes} en {destino}"
         util.respuesta(msg)
         logger.log(msg, 1)
-    except Exception as Argument:
+    except Exception as e:
         util.respuesta(f"Error al mover {args[:-1]} en {args[-1]}", "error")
-        logger.log(str(Argument), 3)
+        logger.log(str(e), 3)
 
 def renombrar(archivo, nuevo_nombre):
     """
@@ -70,9 +72,9 @@ def renombrar(archivo, nuevo_nombre):
         msg = f"renombrado {archivo} a {nuevo_nombre}"
         util.respuesta(msg)
         logger.log(msg, 1)
-    except Exception as Argument:
+    except Exception as e:
         util.respuesta(f"Error al renombrar {archivo} a {nuevo_nombre}", "error")
-        logger.log(str(Argument), 3)
+        logger.log(str(e), 3)
 
 def listar(ruta = "."):
     """
@@ -88,9 +90,9 @@ def listar(ruta = "."):
             else:
                 print("\t"+Fore.YELLOW+f"📂 {recurso.name}")        
         logger.log(msg, 1)
-    except Exception as Argument:
+    except Exception as e:
         util.respuesta(f"Error al listar archivos y carpeta de la ruta {ruta}", "error")
-        logger.log(str(Argument), 3)
+        logger.log(str(e), 3)
 
 def creadir(args):
     """
@@ -102,9 +104,9 @@ def creadir(args):
             msg = f"Creado(s) directorio(s) {args}"
         util.respuesta(msg)
         logger.log(msg, 1)
-    except Exception as Argument:
+    except Exception as e:
         util.respuesta(f"Error al crear directorio(s) {args}", "error")
-        logger.log(str(Argument), 3)
+        logger.log(str(e), 3)
 
 def ir(directorio):
     """
@@ -115,9 +117,9 @@ def ir(directorio):
         msg = f"Cambiado al directorio: {os.getcwd()}"
         util.respuesta(msg)
         logger.log(msg, 1)
-    except Exception as Argument:
+    except Exception as e:
         util.respuesta(f"Error al cambiar al directorio {directorio}", "error")
-        logger.log(str(Argument), 3)
+        logger.log(str(e), 3)
 
 def change_password(username = "root"):
     """
@@ -156,9 +158,9 @@ def permiso(nombre_del_recurso, permiso):
         msg = f"Asignado {permiso} a recurso {nombre_del_recurso}"
         util.respuesta(msg)
         logger.log(msg, 1)
-    except Exception as Argument:
+    except Exception as e:
         util.respuesta(f"Error al aplicar permiso {permiso} al recurso {nombre_del_recurso}", "error")
-        logger.log(str(Argument), 3)
+        logger.log(str(e), 3)
 
 def propiedad(recursos):
     """
@@ -172,10 +174,10 @@ def propiedad(recursos):
         uid = pwd.getpwnam(user_name).pw_uid
         gid = grp.getgrnam(group_name).gr_gid
 
-    except KeyError as Argument:
+    except KeyError as e:
         msg = f"No existe el usuario o el grupo: {user_name}:{group_name}"
         print(msg)
-        logger.log(str(Argument), 1)
+        logger.log(str(e), 1)
             
     # Aplicar chown a los recursos
     for path in recursos:
@@ -196,9 +198,9 @@ def propiedad(recursos):
             msg = f"Cambiada propiedad de {recurso} a grupo {group_name} y usuario {user_name}"
             util.respuesta(msg)
             logger.log(msg, 1)
-        except Exception as Argument:
+        except Exception as e:
             util.respuesta(f"Error al cambiar la propiedad de {recursos} a grupo {group_name} y usuario {user_name}", "error")
-            logger.log(str(Argument), 3)
+            logger.log(str(e), 3)
 
 
 def ruta():
@@ -228,10 +230,10 @@ def buscar(file_path, search_string):
             msg = f"El archivo {file_path} no es válido."
             util.respuesta(msg, "error")
             raise Exception(msg)
-    except Exception as Argument:
-        msg = f"Ha ocurrido un error: busqueda de cadena {search_string} en archivo {file_path}", str(Argument)
+    except Exception as e:
+        msg = f"Ha ocurrido un error: busqueda de cadena {search_string} en archivo {file_path}", str(e)
         util.respuesta(msg, "error")
-        logger.log(str(Argument), 3)
+        logger.log(str(e), 3)
 
 def ejecutar(args):
     """
@@ -248,7 +250,8 @@ def ejecutar(args):
         'grep': 'buscar',
         'pwd': 'ruta',
         'cd': 'ir',
-        'ls': 'listar'
+        'ls': 'listar',
+        'fpt': 'transferir',
     }
 
     implementado = comandos.get(comando)
@@ -259,8 +262,37 @@ def ejecutar(args):
     try:
         subprocess.run(args)
 
-    except Exception as Argument:
+    except Exception as e:
         msg = f"Comando de sistema no valido: {' '.join(args)}"
         util.respuesta(msg, "error")
-        logger.log(str(Argument), 3)
+        logger.log(str(e), 3)
     
+
+def matar():
+    mostrar_procesos()
+    while True:
+        pid = input(f"{Fore.CYAN}Ingrese PID de proceso o presione <enter> para salir: {Fore.GREEN}")
+        if (pid):
+            mostrar_procesos()
+            matar_proceso(pid)            
+        else:
+            break
+
+def mostrar_procesos():
+    procesos = []
+    for proc in psutil.process_iter():
+        try:
+            procesos.append(f"{Fore.BLUE}{proc.name()} ({Fore.YELLOW}{proc.pid})")            
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    print(' | '.join(procesos))
+
+def matar_proceso(pid):
+    try:
+        os.kill(int(pid), signal.SIGKILL)
+        msg = f"Proceso {pid} terminado"
+        util.respuesta(msg)
+        logger.log(msg, 1)
+    except Exception as e:
+        util.respuesta(f"Error al terminar el proceso {pid}, {str(e)}", "error")
+        logger.log(str(e), 3)
