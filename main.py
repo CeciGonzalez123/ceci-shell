@@ -1,9 +1,39 @@
 import util
+import ftp
+import socket
+import daemon
+import logger
+from datetime import datetime
 import comandos
 from colorama import init, Fore, Back
-import subprocess
 
 init(autoreset=True)
+
+entrada = datetime.strptime(
+    "08:00:00",
+    "%H:%M:%S"
+).time()
+
+salida = datetime.strptime(
+    "16:00:00",
+    "%H:%M:%S"
+).time()
+
+ip = "127.0.1.1"
+
+def log_entrada(entrada, salida, ip):
+    hora = datetime.now().strftime("%H:%M:%S")
+    hora_actual = datetime.strptime(hora, "%H:%M:%S").time()
+    ip_actual = socket.gethostbyname(socket.gethostname())
+    logger.log("Inicio de sesión", 0)
+    if util.time_in_range(entrada, salida, hora_actual) == False:
+        logger.log(f"Inicio de sesión fuera del horario establecido: {entrada} - {salida}", 0)
+    if ip_actual != ip:
+        logger.log(f"Inicio de sesión desde ip {ip_actual} distinta a la ip establecida {ip} ", 0)
+        
+
+def log_salida():
+    logger.log("Cierre de sesión", 0)
 
 def ayuda():
     print(util.negrita(Fore.YELLOW+"COMANDOS DISPONIBLES"))
@@ -19,21 +49,25 @@ def ayuda():
     print(f"  historial ==> Muestra el historial de comandos ejecutados")
     print(f"  buscar {Fore.BLUE}[arcivo] {Fore.GREEN}[cadena] {Fore.RESET} ==> Buscar cadena en archivo de texto")
     print(f"  ejecutar {Fore.BLUE}[comando] {Fore.RESET} ==> Ejecutar otros comandos")
-    print(f"  stop ==> stop")
+    print(f"  transferir {Fore.BLUE}[archivo] {Fore.RESET} ==> Transfiere archivo a servidor FTP")
+    print(f"  matar ==> Muestra procesos activos y termina proceso del PID indicado")
+    print(f"  levantar ==> Levanta proceso que se ejecuta en segundo plano")
+    print(f"  detener ==> Detiene proceso que se ejecuta en segundo plano")
     print(f"  clave ==> Cambiar contraseña")
     print(f"  salir ==> Salir de la ceci-shell")
 
 def main():
     """Programa principal que ejecuta los comandos"""
-    print(util.negrita(Back.GREEN+Fore.WHITE+" ***** BIENVENID@ A LA ceci-shell EN PYTHON *****"))
-    history = []
+    print(util.negrita(Back.GREEN+Fore.WHITE+" ***** Bienvenid@ a la ceci-shell *****"))
+    log_entrada(entrada, salida, ip)
     while True:
         cmd = input("ceci-shell> ").strip().split()
-        history.append(' '.join(cmd))
+        util.guardar_historial(' '.join(cmd))
         if not cmd:
             continue
         if cmd[0].lower() == "salir":
-            print("Adiós")
+            log_salida()
+            print(f"{Fore.YELLOW}\tGracias por usar la ceci-shell ...")
             break
         elif cmd[0].lower() == "copiar":
             if len(cmd) > 2:
@@ -82,7 +116,7 @@ def main():
         elif cmd[0].lower() == "ruta":
             comandos.ruta()
         elif cmd[0].lower() == "historial":
-            util.respuesta((", ").join(history))
+            util.leer_historial()
         elif cmd[0].lower() == "buscar":
             if len(cmd) != 3:
                 print(f"Uso: buscar {Fore.BLUE} [archivo] {Fore.GREEN} [cadena]")
@@ -93,8 +127,20 @@ def main():
                 comandos.ejecutar(cmd[1:])
             else:
                 print(f"Uso: ejecutar {Fore.BLUE} [comando]")
+        elif cmd[0].lower() == "transferir":
+            if len(cmd) > 2:
+                print(f"Uso: transferir {Fore.BLUE} [archivo]")
+            else:
+                ftp.transferir(cmd[1])
+        elif cmd[0].lower() == "matar":
+            comandos.matar()
         elif cmd[0].lower() == "ayuda":
             ayuda()
+        elif cmd[0].lower() == "levantar":
+            daemon.stop_flag = False
+            daemon.run_in_background()
+        elif cmd[0].lower() == "detener":
+            daemon.is_alive()            
         else:
             print(util.negrita("COMANDO DESCONOCIDO:") + f"\n\t Escriba {Fore.RED} {util.negrita('ayuda')} {Fore.RESET} para obtener información sobre los comandos disponibles.")
 
