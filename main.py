@@ -2,8 +2,7 @@ import util
 import ftp
 import socket
 import daemon
-import getpass
-import user
+import usuario
 import logger
 from datetime import datetime
 import comandos
@@ -38,32 +37,36 @@ def log_salida():
     logger.log("Cierre de sesión", "sesion")
 
 def ayuda():
-    print(util.negrita(Fore.YELLOW+"COMANDOS DISPONIBLES"))
-    print(f"  copiar {Fore.BLUE}[origen_1] [origen_2] [origen_n] {Fore.GREEN}[destino] {Fore.RESET} ==> Copia archivo(s) o carpeta(s)")
-    print(f"  mover {Fore.BLUE}[origen_1] [origen_2] [origen_n] {Fore.GREEN}[destino] {Fore.RESET} ==> Mueve archivo o carpeta")
-    print(f"  renombrar {Fore.BLUE}[arcivo] {Fore.GREEN}[nuevo_nombre] {Fore.RESET} ==> Renombra archivo")
-    print(f"  listar {Fore.BLUE}[ruta] (opcional) {Fore.RESET} ==> Lista archivos")
-    print(f"  creadir {Fore.BLUE}[dir_1] [dir_2] [dir_3] {Fore.RESET}  ==> Crea directorios")
-    print(f"  ir {Fore.BLUE}[directotio] {Fore.RESET}  ==> Carmbia a directorio")
-    print(f"  permiso {Fore.BLUE}[recurso] {Fore.GREEN}[permiso] {Fore.RESET} ==> Asigna permisos a archivo o carpeta")
-    print(f"  propiedad {Fore.BLUE}[recurso_1] [recurso_2] [recurso_n] {Fore.RESET} ==> Cambia propietario de archivo(s) o carpeta(s)")
-    print(f"  ruta ==> Muestra ruta actual")
-    print(f"  historial ==> Muestra el historial de comandos ejecutados")
-    print(f"  buscar {Fore.BLUE}[arcivo] {Fore.GREEN}[cadena] {Fore.RESET} ==> Buscar cadena en archivo de texto")
-    print(f"  ejecutar {Fore.BLUE}[comando] {Fore.RESET} ==> Ejecutar otros comandos")
-    print(f"  transferir {Fore.BLUE}[archivo] {Fore.RESET} ==> Transfiere archivo a servidor FTP")
-    print(f"  matar ==> Muestra procesos activos y termina proceso del PID indicado")
-    print(f"  levantar ==> Levanta proceso que se ejecuta en segundo plano")
-    print(f"  detener ==> Detiene proceso que se ejecuta en segundo plano")
-    print(f"  creausuario ==> Crea un nuevo usuario")
-    print(f"  salir ==> Salir de la ceci-shell")
+    print(util.negrita(Fore.CYAN+"COMANDOS DISPONIBLES"))
+    print(f"  {Fore.YELLOW}ayuda{Fore.RESET} ==> Muestra lista de comandos disponibles")
+    print(f"  {Fore.YELLOW}copiar{Fore.RESET} {Fore.BLUE}[origen_1] [origen_2] [origen_n] {Fore.GREEN}[destino] {Fore.RESET} ==> Copia archivo(s) o carpeta(s)")
+    print(f"  {Fore.YELLOW}mover{Fore.RESET} {Fore.BLUE}[origen_1] [origen_2] [origen_n] {Fore.GREEN}[destino] {Fore.RESET} ==> Mueve archivo o carpeta")
+    print(f"  {Fore.YELLOW}renombrar{Fore.RESET} {Fore.BLUE}[arcivo] {Fore.GREEN}[nuevo_nombre] {Fore.RESET} ==> Renombra archivo")
+    print(f"  {Fore.YELLOW}listar{Fore.RESET} {Fore.BLUE}[ruta] (opcional) {Fore.RESET} ==> Lista archivos")
+    print(f"  {Fore.YELLOW}creadir{Fore.RESET} {Fore.BLUE}[dir_1] [dir_2] [dir_3] {Fore.RESET}  ==> Crea directorios")
+    print(f"  {Fore.YELLOW}ir{Fore.RESET} {Fore.BLUE}[directotio] {Fore.RESET}  ==> Carmbia a directorio")
+    print(f"  {Fore.YELLOW}permiso{Fore.RESET} {Fore.BLUE}[recurso] {Fore.GREEN}[permiso] {Fore.RESET} ==> Asigna permisos a archivo o carpeta")
+    print(f"  {Fore.YELLOW}propiedad{Fore.RESET} {Fore.BLUE}[recurso_1] [recurso_2] [recurso_n] {Fore.RESET} ==> Cambia propietario de archivo(s) o carpeta(s)")
+    print(f"  {Fore.YELLOW}ruta{Fore.RESET} ==> Muestra ruta actual")
+    print(f"  {Fore.YELLOW}historial{Fore.RESET} ==> Muestra el historial de comandos ejecutados")
+    print(f"  {Fore.YELLOW}buscar{Fore.RESET} {Fore.BLUE}[archivo] {Fore.GREEN}[cadena] {Fore.RESET} ==> Buscar cadena en archivo de texto")
+    print(f"  {Fore.YELLOW}ejecutar{Fore.RESET} {Fore.BLUE}[comando] {Fore.RESET} ==> Ejecutar otros comandos")
+    print(f"  {Fore.YELLOW}transferir{Fore.RESET} {Fore.BLUE}[archivo] {Fore.RESET} ==> Transfiere archivo a servidor FTP")
+    print(f"  {Fore.YELLOW}matar{Fore.RESET} ==> Muestra procesos activos y termina proceso del PID indicado")
+    print(f"  {Fore.YELLOW}levantar{Fore.RESET} ==> Levanta proceso que se ejecuta en segundo plano")
+    print(f"  {Fore.YELLOW}detener{Fore.RESET} ==> Detiene proceso que se ejecuta en segundo plano")
+    print(f"  {Fore.YELLOW}crearusuario{Fore.RESET} {Fore.BLUE}[nombre] {Fore.RESET} ==> Crea un nuevo usuario")
+    print(f"  {Fore.YELLOW}cambiarclave{Fore.RESET} {Fore.BLUE}[usuario] {Fore.RESET} ==> Cambia la contraseña del usuario indicado")
+    print(f"  {Fore.YELLOW}salir{Fore.RESET} ==> Salir de la ceci-shell \n")
 
 def main():
-    """Programa principal que ejecuta los comandos"""
-    print(util.negrita(Back.GREEN+Fore.WHITE+" ***** Bienvenid@ a la ceci-shell *****"))
+    """Programa principal que ejecuta los comandos"""    
+    print(util.negrita(Back.MAGENTA+Fore.WHITE+" ***** Bienvenid@ a la ceci-shell ***** \n"))
+    ayuda()
     log_entrada(entrada, salida, ip)
     while True:
-        cmd = input("ceci-shell> ").strip().split()
+        #cmd = input(f"{Fore.CYAN}{util.negrita('ceci-shell')}> ").strip().split()
+        cmd = util.entrada_teclado("ceci-shell> ").strip().split()
         util.guardar_historial(' '.join(cmd))
         if not cmd:
             continue
@@ -143,13 +146,21 @@ def main():
             daemon.run_in_background()
         elif cmd[0].lower() == "detener":
             daemon.is_alive()
-        elif cmd[0].lower() == "creausuario":
-            if not getpass.getuser() == 'root':
-                util.respuesta("Debe tener privilegios de root", "error")
+        elif cmd[0].lower() == "crearusuario":
+            if len(cmd) > 1:
+                if util.es_root():
+                    usuario.crea_usuario(cmd[1])
             else:
-                user.crea_usuario()
+                print(f"Uso: crearusuario {Fore.BLUE}[nombre]")
+        elif cmd[0].lower() == "cambiarclave":
+            if len(cmd) > 1:
+                if util.es_root():
+                    usuario.cambiar_clave(cmd[1])                    
+            else:
+                print(f"Uso: cambiarclave {Fore.BLUE}[usuario]")
         else:
-            print(util.negrita("COMANDO DESCONOCIDO:") + f"\n\t Escriba {Fore.RED} {util.negrita('ayuda')} {Fore.RESET} para obtener información sobre los comandos disponibles.")
+            print(util.negrita("\nCOMANDO DESCONOCIDO:") + f"\n\t Escriba {Fore.RED} {util.negrita('ayuda')} {Fore.RESET} para obtener información sobre los comandos disponibles.\n")
 
 if __name__ == "__main__":
+    comandos.ejecutar("clear")
     main()
