@@ -17,9 +17,10 @@
 - chamox -R 775 /var/log/shell
 
 ### Instalación
+----
 
 #### Clonar repositorio
-- git clone repor-ceci-shell
+- git clone https://github.com/CeciGonzalez123/ceci-shell-lfs-ceci-shell
 
 #### Preparar arranque automático
 
@@ -33,9 +34,10 @@
   - chmox +x /etc/profile
   - Ejecutar comando source o reiniciar sistema
 
-----
 
-## Table of Contents<br>
+
+## Tabla de contenido<br>
+
 - [Despliegue de ayuda con comandos disponibles](#ayuda)<br>
 - [Copiar archivo(s) y directorio(s)](#copiar)<br>
 - [Mover archivo(s) y directorio(s)](#mover)<br>
