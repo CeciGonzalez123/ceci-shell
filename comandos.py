@@ -37,10 +37,10 @@ def copiar(args):
                 shutil.copytree(path, destino, symlinks = False, dirs_exist_ok=True)
         msg = f"Copiado {origenes} en {destino}"
         util.respuesta(msg)
-        logger.log(msg, 1)
+        logger.log(msg, "accion")
     except Exception as e:
         util.respuesta(f"Error al copiar {args[:-1]} en {args[-1]}", "error")
-        logger.log(str(e), 3)
+        logger.log(str(e), "sistema")
 
 def mover(args):
     """
@@ -57,10 +57,10 @@ def mover(args):
                 shutil.move(path, destino, copy_function = shutil.copytree)
         msg = f"Movido {origenes} en {destino}"
         util.respuesta(msg)
-        logger.log(msg, 1)
+        logger.log(msg, "accion")
     except Exception as e:
         util.respuesta(f"Error al mover {args[:-1]} en {args[-1]}", "error")
-        logger.log(str(e), 3)
+        logger.log(str(e), "sistema")
 
 def renombrar(archivo, nuevo_nombre):
     """
@@ -71,10 +71,10 @@ def renombrar(archivo, nuevo_nombre):
         path.rename(nuevo_nombre)
         msg = f"renombrado {archivo} a {nuevo_nombre}"
         util.respuesta(msg)
-        logger.log(msg, 1)
+        logger.log(msg, "accion")
     except Exception as e:
         util.respuesta(f"Error al renombrar {archivo} a {nuevo_nombre}", "error")
-        logger.log(str(e), 3)
+        logger.log(str(e), "sistema")
 
 def listar(ruta = "."):
     """
@@ -89,10 +89,10 @@ def listar(ruta = "."):
                 print("\t"+Fore.GREEN+f"📄 {recurso.name}")
             else:
                 print("\t"+Fore.YELLOW+f"📂 {recurso.name}")        
-        logger.log(msg, 1)
+        logger.log(msg, "accion")
     except Exception as e:
         util.respuesta(f"Error al listar archivos y carpeta de la ruta {ruta}", "error")
-        logger.log(str(e), 3)
+        logger.log(str(e), "sistema")
 
 def creadir(args):
     """
@@ -103,10 +103,10 @@ def creadir(args):
             Path(directorio).mkdir(parents=True, exist_ok=True)
             msg = f"Creado(s) directorio(s) {args}"
         util.respuesta(msg)
-        logger.log(msg, 1)
+        logger.log(msg, "accion")
     except Exception as e:
         util.respuesta(f"Error al crear directorio(s) {args}", "error")
-        logger.log(str(e), 3)
+        logger.log(str(e), "sistema")
 
 def ir(directorio):
     """
@@ -116,10 +116,10 @@ def ir(directorio):
         os.chdir(directorio)
         msg = f"Cambiado al directorio: {os.getcwd()}"
         util.respuesta(msg)
-        logger.log(msg, 1)
+        logger.log(msg, "accion")
     except Exception as e:
         util.respuesta(f"Error al cambiar al directorio {directorio}", "error")
-        logger.log(str(e), 3)
+        logger.log(str(e), "sistema")
 
 def change_password(username = "root"):
     """
@@ -132,7 +132,7 @@ def change_password(username = "root"):
     if new_password != confirm_password:
         return "Nuevo password y confirmacion no coinciden."
     
-    print("TODO")
+    print("Por Hacer")
 
 def permiso(nombre_del_recurso, permiso):
     """
@@ -157,10 +157,10 @@ def permiso(nombre_del_recurso, permiso):
 
         msg = f"Asignado {permiso} a recurso {nombre_del_recurso}"
         util.respuesta(msg)
-        logger.log(msg, 1)
+        logger.log(msg, "accion")
     except Exception as e:
         util.respuesta(f"Error al aplicar permiso {permiso} al recurso {nombre_del_recurso}", "error")
-        logger.log(str(e), 3)
+        logger.log(str(e), "sistema")
 
 def propiedad(recursos):
     """
@@ -177,7 +177,7 @@ def propiedad(recursos):
     except KeyError as e:
         msg = f"No existe el usuario o el grupo: {user_name}:{group_name}"
         print(msg)
-        logger.log(str(e), 1)
+        logger.log(str(e), "sistema")
             
     # Aplicar chown a los recursos
     for path in recursos:
@@ -186,7 +186,7 @@ def propiedad(recursos):
         else:
             msg = f"No existe recurso {path}"
             util.respuesta(msg, "error")
-            logger.log(msg, 1)
+            logger.log(msg, "sistema")
             continue
         try:
             if recurso.is_file():
@@ -197,10 +197,10 @@ def propiedad(recursos):
             
             msg = f"Cambiada propiedad de {recurso} a grupo {group_name} y usuario {user_name}"
             util.respuesta(msg)
-            logger.log(msg, 1)
+            logger.log(msg, "accion")
         except Exception as e:
             util.respuesta(f"Error al cambiar la propiedad de {recursos} a grupo {group_name} y usuario {user_name}", "error")
-            logger.log(str(e), 3)
+            logger.log(str(e), "sistema")
 
 
 def ruta():
@@ -210,7 +210,7 @@ def ruta():
     ruta_actual = os.getcwd() 
     msg = "Ruta actual " + str(ruta_actual)
     util.respuesta(msg)
-    logger.log(msg, 1)
+    logger.log(msg, "accion")
 
 def buscar(file_path, search_string):
     """
@@ -225,7 +225,7 @@ def buscar(file_path, search_string):
                     print(contents.replace(search_string, Fore.GREEN + "\033[1m" + search_string + "\033[0m"))
                 else:
                     util.respuesta("No se encontró la cadena en el archivo.")
-            logger.log(f"Busqueda de {search_string} en archivo {file_path}", 1)
+            logger.log(f"Busqueda de {search_string} en archivo {file_path}", "accion")
         else:
             msg = f"El archivo {file_path} no es válido."
             util.respuesta(msg, "error")
@@ -233,7 +233,7 @@ def buscar(file_path, search_string):
     except Exception as e:
         msg = f"Ha ocurrido un error: busqueda de cadena {search_string} en archivo {file_path}", str(e)
         util.respuesta(msg, "error")
-        logger.log(str(e), 3)
+        logger.log(str(e), "sistema")
 
 def ejecutar(args):
     """
@@ -256,16 +256,17 @@ def ejecutar(args):
 
     implementado = comandos.get(comando)
     if implementado:
-        util.respuesta(f"Comando implementado, por favor consulte en la {Fore.BLUE}ayuda{Fore.RESET} el comando{Fore.BLUE} {implementado}")
+        util.respuesta(f"Comando implementado, por favor consulte en la {Fore.BLUE}ayuda{Fore.RESET} el comando{Fore.BLUE} {implementado}", "error")
         return
 
     try:
         subprocess.run(args)
+        logger.log(f"Ejecutada accion externa {args}", "accion")
 
     except Exception as e:
         msg = f"Comando de sistema no valido: {' '.join(args)}"
         util.respuesta(msg, "error")
-        logger.log(str(e), 3)
+        logger.log(str(e), "sistema")
     
 
 def matar():
@@ -292,7 +293,7 @@ def matar_proceso(pid):
         os.kill(int(pid), signal.SIGKILL)
         msg = f"Proceso {pid} terminado"
         util.respuesta(msg)
-        logger.log(msg, 1)
+        logger.log(msg, "accion")
     except Exception as e:
         util.respuesta(f"Error al terminar el proceso {pid}, {str(e)}", "error")
-        logger.log(str(e), 3)
+        logger.log(str(e), "sistema")
