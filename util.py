@@ -1,5 +1,4 @@
 import emoji
-from datetime import datetime
 from colorama import init, Fore
 
 init(autoreset=True)
