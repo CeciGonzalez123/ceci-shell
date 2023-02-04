@@ -19,8 +19,8 @@ def transferir(archivo):
         ftp.quit()
         log = f"Archivo {archivo} transferido exitosamente a {host}"        
         util.respuesta(log)
-        logger.log(str(log), 2)
+        logger.log(str(log), "ftp")
     except Exception as e:
         log = f"Error al transferir el archivo {archivo} a {host}: {e}"
         util.respuesta(log, "error")
-        logger.log(str(e), 3)
+        logger.log(str(e), "sistema")
