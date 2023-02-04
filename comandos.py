@@ -272,7 +272,8 @@ def ejecutar(args):
 def matar():
     mostrar_procesos()
     while True:
-        pid = input(f"{Fore.CYAN}Ingrese PID de proceso o presione <enter> para salir: {Fore.GREEN}")
+        pid = input("Ingrese PID de proceso o presione <enter> para salir: ")
+        
         if (pid):
             mostrar_procesos()
             matar_proceso(pid)            
