@@ -7,7 +7,13 @@ stop_flag = False
 background_thread = None
 
 def run_in_background():
-    def background_task():        
+    """
+    Emula proceso que se ejecuta en segundo plano, desplegando mensaje cada 7 segundo, permite
+    levantar y detener dicho proceso
+    """
+
+    def background_task():
+        # Invoca ejecucion de tarea hasta que se detenga
         while not stop_flag:
             task()
             time.sleep(7)
@@ -22,10 +28,12 @@ def task():
     util.respuesta("Ejecutando tarea en segundo plano... \n este msg aparece cada 7 seg. para demostrar que el proceso esta activo")
 
 def is_alive():
+    # Verifica si existe hilo de ejecucion
     if background_thread is None:
         util.respuesta("No hay proceso activo", "error")
         logger.log("Usuario intenta detener proceso no activo", "sistema")
     else:
+        # Verifica si proceso esta vivo
         if background_thread.is_alive():
             global stop_flag
             stop_flag = True
