@@ -1,21 +1,25 @@
 import logging
-import os
 
-def log(msg, tipo):
-    # Tipos de logs
-    logs = ['user_access', 'user_actions', 'ftp_transfer', 'system_error']
+def log(message, log_type):
+    logger = logging.getLogger(log_type)
+    logger.setLevel(logging.INFO)
 
-    # Configuración básica del logger
-    logging.basicConfig(filename="/var/log/shell/"+logs[tipo]+".log",
-                    format='%(asctime)s %(message)s',
-                    filemode='a')
+    log_file = "/var/log/shell/{}.log".format(log_type)
+    handler = logging.FileHandler(log_file)
+    handler.setLevel(logging.INFO)
 
-    # Crear un objeto logger
-    logger = logging.getLogger()
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
 
-    # Configurar umbral deñ logger
-    logger.setLevel(logging.DEBUG)
+    logger.addHandler(handler)
 
-    # Registrar evento
-    username = os.getlogin()
-    logger.info(f"{username}: {msg}")
+    if log_type == "accion":
+        logger.info(message)
+    elif log_type == "sistema":
+        logger.info(message)
+    elif log_type == "sesion":
+        logger.info(message)
+    elif log_type == "ftp":
+        logger.info(message)
+    else:
+        raise ValueError("Tipo de log no válido")
