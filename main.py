@@ -2,6 +2,8 @@ import util
 import ftp
 import socket
 import daemon
+import getpass
+import user
 import logger
 from datetime import datetime
 import comandos
@@ -25,15 +27,15 @@ def log_entrada(entrada, salida, ip):
     hora = datetime.now().strftime("%H:%M:%S")
     hora_actual = datetime.strptime(hora, "%H:%M:%S").time()
     ip_actual = socket.gethostbyname(socket.gethostname())
-    logger.log("Inicio de sesión", 0)
+    logger.log("Inicio de sesión", "accion")
     if util.time_in_range(entrada, salida, hora_actual) == False:
-        logger.log(f"Inicio de sesión fuera del horario establecido: {entrada} - {salida}", 0)
+        logger.log(f"Inicio de sesión fuera del horario establecido: {entrada} - {salida}", "sesion")
     if ip_actual != ip:
-        logger.log(f"Inicio de sesión desde ip {ip_actual} distinta a la ip establecida {ip} ", 0)
+        logger.log(f"Inicio de sesión desde ip {ip_actual} distinta a la ip establecida {ip}", "sesion")
         
 
 def log_salida():
-    logger.log("Cierre de sesión", 0)
+    logger.log("Cierre de sesión", "sesion")
 
 def ayuda():
     print(util.negrita(Fore.YELLOW+"COMANDOS DISPONIBLES"))
@@ -53,7 +55,7 @@ def ayuda():
     print(f"  matar ==> Muestra procesos activos y termina proceso del PID indicado")
     print(f"  levantar ==> Levanta proceso que se ejecuta en segundo plano")
     print(f"  detener ==> Detiene proceso que se ejecuta en segundo plano")
-    print(f"  clave ==> Cambiar contraseña")
+    print(f"  creausuario ==> Crea un nuevo usuario")
     print(f"  salir ==> Salir de la ceci-shell")
 
 def main():
@@ -140,7 +142,12 @@ def main():
             daemon.stop_flag = False
             daemon.run_in_background()
         elif cmd[0].lower() == "detener":
-            daemon.is_alive()            
+            daemon.is_alive()
+        elif cmd[0].lower() == "creausuario":
+            if not getpass.getuser() == 'root':
+                util.respuesta("Debe tener privilegios de root", "error")
+            else:
+                user.crea_usuario()
         else:
             print(util.negrita("COMANDO DESCONOCIDO:") + f"\n\t Escriba {Fore.RED} {util.negrita('ayuda')} {Fore.RESET} para obtener información sobre los comandos disponibles.")
 
